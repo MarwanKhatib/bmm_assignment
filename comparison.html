@@ -17,7 +17,6 @@
 
     .compare-box {
       position: relative;
-      display: inline-block;
       width: 100%;
       overflow: hidden;
       border-radius: 12px;
@@ -30,6 +29,7 @@
       width: 100%;
       height: auto;
       user-select: none;
+      pointer-events: none;
     }
 
     .overlay {
@@ -41,12 +41,6 @@
       overflow: hidden;
     }
 
-    .overlay img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
     .slider-handle {
       position: absolute;
       top: 0;
@@ -56,19 +50,26 @@
       background: var(--accent);
       cursor: ew-resize;
       transition: background 0.3s;
+      z-index: 10;
+      transform: translateX(-2px);
     }
 
     .slider-handle::after {
-      content: "";
+      content: "↔";
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 26px;
-      height: 26px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--accent);
       border-radius: 50%;
-      background: var(--accent);
+      background: white;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 0 4px white, 0 2px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .slider-handle:hover {
@@ -128,9 +129,9 @@
       <h2>Photograph Comparison</h2>
 
       <div class="compare-box" id="photoBox">
-        <img src="assets/sample-photo.jpg" alt="Right side" id="photoRight">
+        <img src="assets/sample-photo.jpg" alt="Photograph of a sunlit forest" id="photoRight">
         <div class="overlay" id="photoOverlay">
-          <img src="assets/sample-photo.webp" alt="Left side" id="photoLeft">
+          <img src="assets/sample-photo.webp" alt="Photograph of a sunlit forest" id="photoLeft">
         </div>
         <div class="slider-handle" id="photoHandle"></div>
       </div>
@@ -145,6 +146,7 @@
             <option value="assets/sample-photo.webp">WEBP</option>
             <option value="assets/sample-photo.avif">AVIF</option>
             <option value="assets/sample-photo.png">PNG</option>
+            <option value="assets/sample-photo.jpg">JPEG</option>
           </select>
         </label>
         <label>Right:
@@ -152,9 +154,9 @@
             <option value="assets/sample-photo.jpg">JPEG</option>
             <option value="assets/sample-photo.webp">WEBP</option>
             <option value="assets/sample-photo.avif">AVIF</option>
+            <option value="assets/sample-photo.png">PNG</option>
           </select>
         </label>
-        <button id="btnPhotoSize">Show Sizes</button>
         <span id="photoSizeOut"></span>
       </div>
     </section>
@@ -164,9 +166,9 @@
       <h2>Graphic / Logo Comparison</h2>
 
       <div class="compare-box" id="graphicBox">
-        <img src="assets/sample-graphic.png" alt="Right side" id="graphicRight">
+        <img src="assets/sample-graphic.png" alt="PixelVision logo graphic" id="graphicRight">
         <div class="overlay" id="graphicOverlay">
-          <img src="assets/sample-graphic.webp" alt="Left side" id="graphicLeft">
+          <img src="assets/sample-graphic.webp" alt="PixelVision logo graphic" id="graphicLeft">
         </div>
         <div class="slider-handle" id="graphicHandle"></div>
       </div>
@@ -181,6 +183,7 @@
             <option value="assets/sample-graphic.webp">WEBP</option>
             <option value="assets/sample-graphic.avif">AVIF</option>
             <option value="assets/sample-graphic.png">PNG</option>
+            <option value="assets/sample-graphic.jpg">JPEG</option>
           </select>
         </label>
         <label>Right:
@@ -188,9 +191,9 @@
             <option value="assets/sample-graphic.png">PNG</option>
             <option value="assets/sample-graphic.jpg">JPEG</option>
             <option value="assets/sample-graphic.webp">WEBP</option>
+            <option value="assets/sample-graphic.avif">AVIF</option>
           </select>
         </label>
-        <button id="btnGraphicSize">Show Sizes</button>
         <span id="graphicSizeOut"></span>
       </div>
     </section>
@@ -212,30 +215,41 @@
       const slide = x => {
         const rect = box.getBoundingClientRect();
         let pos = x - rect.left;
+        
+        // Clamp the position to the box boundaries
         if (pos < 0) pos = 0;
         if (pos > rect.width) pos = rect.width;
+        
         overlay.style.width = pos + "px";
         handle.style.left = pos + "px";
       };
 
       const start = e => {
         active = true;
+        // Optional: Add a class to the body to prevent text selection while dragging
+        document.body.classList.add('is-dragging');
         slide(e.touches ? e.touches[0].clientX : e.clientX);
       };
 
-      const stop = () => (active = false);
+      const stop = () => {
+        active = false;
+        // Optional: Remove the dragging class
+        document.body.classList.remove('is-dragging');
+      };
 
       const move = e => {
         if (!active) return;
+        // Prevent default behavior (like scrolling) while dragging
+        e.preventDefault();
         slide(e.touches ? e.touches[0].clientX : e.clientX);
       };
 
       handle.addEventListener("mousedown", start);
-      handle.addEventListener("touchstart", start);
+      handle.addEventListener("touchstart", start, { passive: false });
       window.addEventListener("mouseup", stop);
       window.addEventListener("touchend", stop);
       window.addEventListener("mousemove", move);
-      window.addEventListener("touchmove", move);
+      window.addEventListener("touchmove", move, { passive: false });
     }
 
     initCompare("photoBox", "photoOverlay", "photoHandle");
@@ -252,22 +266,28 @@
       }
     }
 
-    function setupControl(leftSel, rightSel, leftImg, rightImg, leftLbl, rightLbl, btn, out) {
+    function setupControl(leftSel, rightSel, leftImg, rightImg, leftLbl, rightLbl, out) {
       const ext = p => p.split('.').pop().toUpperCase();
+
+      const updateSizes = async () => {
+        out.textContent = "Loading...";
+        const [a, b] = await Promise.all([getSize(leftImg.src), getSize(rightImg.src)]);
+        out.textContent = `Left: ${a} | Right: ${b}`;
+      };
 
       leftSel.addEventListener("change", () => {
         leftImg.src = leftSel.value;
         leftLbl.textContent = ext(leftSel.value);
+        updateSizes();
       });
       rightSel.addEventListener("change", () => {
         rightImg.src = rightSel.value;
         rightLbl.textContent = ext(rightSel.value);
+        updateSizes();
       });
-      btn.addEventListener("click", async () => {
-        out.textContent = "Loading...";
-        const [a, b] = await Promise.all([getSize(leftImg.src), getSize(rightImg.src)]);
-        out.textContent = `Left: ${a} | Right: ${b}`;
-      });
+      
+      // Initial size load
+      updateSizes();
     }
 
     setupControl(
@@ -277,7 +297,6 @@
       document.getElementById("photoRight"),
       document.getElementById("labelPhotoLeft"),
       document.getElementById("labelPhotoRight"),
-      document.getElementById("btnPhotoSize"),
       document.getElementById("photoSizeOut")
     );
 
@@ -288,7 +307,6 @@
       document.getElementById("graphicRight"),
       document.getElementById("labelGraphicLeft"),
       document.getElementById("labelGraphicRight"),
-      document.getElementById("btnGraphicSize"),
       document.getElementById("graphicSizeOut")
     );
   </script>
