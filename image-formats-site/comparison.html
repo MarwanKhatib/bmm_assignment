@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image Format Comparison — PixelVision</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body {
+      background: #f7fafc;
+    }
+
+    .compare-section {
+      max-width: 900px;
+      margin: 60px auto;
+    }
+
+    .compare-box {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      background: #fff;
+    }
+
+    .compare-box img {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .overlay img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 4px;
+      height: 100%;
+      background: var(--accent);
+      cursor: ew-resize;
+      transition: background 0.3s;
+    }
+
+    .slider-handle::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 4px white, 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-handle:hover {
+      background: #155e58;
+    }
+
+    .compare-label {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .format-controls {
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    .format-controls select,
+    .format-controls button {
+      margin: 0 6px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.svg" alt="PixelVision logo" class="logo">
+      <span>PixelVision</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="comparison.html" class="active">Comparison</a>
+      <a href="ai.html">AI Samples</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Compare Image Formats</h1>
+    <p>
+      Drag the circular handle to compare two formats of the same image.  
+      The container automatically resizes to fit the image’s natural proportions.
+    </p>
+
+    <!-- ========== PHOTO COMPARISON ========== -->
+    <section class="compare-section">
+      <h2>Photograph Comparison</h2>
+
+      <div class="compare-box" id="photoBox">
+        <img src="assets/sample-photo.jpg" alt="Right side" id="photoRight">
+        <div class="overlay" id="photoOverlay">
+          <img src="assets/sample-photo.webp" alt="Left side" id="photoLeft">
+        </div>
+        <div class="slider-handle" id="photoHandle"></div>
+      </div>
+
+      <div class="compare-label">
+        Left: <span id="labelPhotoLeft">WEBP</span> | Right: <span id="labelPhotoRight">JPEG</span>
+      </div>
+
+      <div class="format-controls">
+        <label>Left:
+          <select id="leftPhotoSelect">
+            <option value="assets/sample-photo.webp">WEBP</option>
+            <option value="assets/sample-photo.avif">AVIF</option>
+            <option value="assets/sample-photo.png">PNG</option>
+          </select>
+        </label>
+        <label>Right:
+          <select id="rightPhotoSelect">
+            <option value="assets/sample-photo.jpg">JPEG</option>
+            <option value="assets/sample-photo.webp">WEBP</option>
+            <option value="assets/sample-photo.avif">AVIF</option>
+          </select>
+        </label>
+        <button id="btnPhotoSize">Show Sizes</button>
+        <span id="photoSizeOut"></span>
+      </div>
+    </section>
+
+    <!-- ========== GRAPHIC COMPARISON ========== -->
+    <section class="compare-section">
+      <h2>Graphic / Logo Comparison</h2>
+
+      <div class="compare-box" id="graphicBox">
+        <img src="assets/sample-graphic.png" alt="Right side" id="graphicRight">
+        <div class="overlay" id="graphicOverlay">
+          <img src="assets/sample-graphic.webp" alt="Left side" id="graphicLeft">
+        </div>
+        <div class="slider-handle" id="graphicHandle"></div>
+      </div>
+
+      <div class="compare-label">
+        Left: <span id="labelGraphicLeft">WEBP</span> | Right: <span id="labelGraphicRight">PNG</span>
+      </div>
+
+      <div class="format-controls">
+        <label>Left:
+          <select id="leftGraphicSelect">
+            <option value="assets/sample-graphic.webp">WEBP</option>
+            <option value="assets/sample-graphic.avif">AVIF</option>
+            <option value="assets/sample-graphic.png">PNG</option>
+          </select>
+        </label>
+        <label>Right:
+          <select id="rightGraphicSelect">
+            <option value="assets/sample-graphic.png">PNG</option>
+            <option value="assets/sample-graphic.jpg">JPEG</option>
+            <option value="assets/sample-graphic.webp">WEBP</option>
+          </select>
+        </label>
+        <button id="btnGraphicSize">Show Sizes</button>
+        <span id="graphicSizeOut"></span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>Move the handle to visually inspect compression and transparency differences.</small>
+  </footer>
+
+  <script>
+    /* === Universal compare setup === */
+    function initCompare(boxId, overlayId, handleId) {
+      const box = document.getElementById(boxId);
+      const overlay = document.getElementById(overlayId);
+      const handle = document.getElementById(handleId);
+
+      let active = false;
+
+      const slide = x => {
+        const rect = box.getBoundingClientRect();
+        let pos = x - rect.left;
+        if (pos < 0) pos = 0;
+        if (pos > rect.width) pos = rect.width;
+        overlay.style.width = pos + "px";
+        handle.style.left = pos + "px";
+      };
+
+      const start = e => {
+        active = true;
+        slide(e.touches ? e.touches[0].clientX : e.clientX);
+      };
+
+      const stop = () => (active = false);
+
+      const move = e => {
+        if (!active) return;
+        slide(e.touches ? e.touches[0].clientX : e.clientX);
+      };
+
+      handle.addEventListener("mousedown", start);
+      handle.addEventListener("touchstart", start);
+      window.addEventListener("mouseup", stop);
+      window.addEventListener("touchend", stop);
+      window.addEventListener("mousemove", move);
+      window.addEventListener("touchmove", move);
+    }
+
+    initCompare("photoBox", "photoOverlay", "photoHandle");
+    initCompare("graphicBox", "graphicOverlay", "graphicHandle");
+
+    /* === Dropdowns + Size === */
+    async function getSize(url) {
+      try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return (blob.size / 1024).toFixed(1) + " KB";
+      } catch {
+        return "N/A";
+      }
+    }
+
+    function setupControl(leftSel, rightSel, leftImg, rightImg, leftLbl, rightLbl, btn, out) {
+      const ext = p => p.split('.').pop().toUpperCase();
+
+      leftSel.addEventListener("change", () => {
+        leftImg.src = leftSel.value;
+        leftLbl.textContent = ext(leftSel.value);
+      });
+      rightSel.addEventListener("change", () => {
+        rightImg.src = rightSel.value;
+        rightLbl.textContent = ext(rightSel.value);
+      });
+      btn.addEventListener("click", async () => {
+        out.textContent = "Loading...";
+        const [a, b] = await Promise.all([getSize(leftImg.src), getSize(rightImg.src)]);
+        out.textContent = `Left: ${a} | Right: ${b}`;
+      });
+    }
+
+    setupControl(
+      document.getElementById("leftPhotoSelect"),
+      document.getElementById("rightPhotoSelect"),
+      document.getElementById("photoLeft"),
+      document.getElementById("photoRight"),
+      document.getElementById("labelPhotoLeft"),
+      document.getElementById("labelPhotoRight"),
+      document.getElementById("btnPhotoSize"),
+      document.getElementById("photoSizeOut")
+    );
+
+    setupControl(
+      document.getElementById("leftGraphicSelect"),
+      document.getElementById("rightGraphicSelect"),
+      document.getElementById("graphicLeft"),
+      document.getElementById("graphicRight"),
+      document.getElementById("labelGraphicLeft"),
+      document.getElementById("labelGraphicRight"),
+      document.getElementById("btnGraphicSize"),
+      document.getElementById("graphicSizeOut")
+    );
+  </script>
+</body>
+</html>
