@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Image Format Comparison — PixelVision</title>
+  <title>Image Format Comparison - PixelVision</title>
+  <link rel="icon" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/styles.css" />
   <style>
     body {
@@ -17,6 +18,7 @@
 
     .compare-box {
       position: relative;
+      display: inline-block;
       width: 100%;
       overflow: hidden;
       border-radius: 12px;
@@ -29,7 +31,6 @@
       width: 100%;
       height: auto;
       user-select: none;
-      pointer-events: none;
     }
 
     .overlay {
@@ -41,6 +42,12 @@
       overflow: hidden;
     }
 
+    .overlay img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     .slider-handle {
       position: absolute;
       top: 0;
@@ -50,26 +57,19 @@
       background: var(--accent);
       cursor: ew-resize;
       transition: background 0.3s;
-      z-index: 10;
-      transform: translateX(-2px);
     }
 
     .slider-handle::after {
-      content: "↔";
+      content: "";
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      color: var(--accent);
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: white;
+      background: var(--accent);
       transform: translate(-50%, -50%);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 0 4px white, 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
     .slider-handle:hover {
@@ -166,9 +166,9 @@
       <h2>Graphic / Logo Comparison</h2>
 
       <div class="compare-box" id="graphicBox">
-        <img src="assets/sample-graphic.png" alt="PixelVision logo graphic" id="graphicRight">
+        <img src="assets/sample-graphic.png" alt="Right side" id="graphicRight">
         <div class="overlay" id="graphicOverlay">
-          <img src="assets/sample-graphic.webp" alt="PixelVision logo graphic" id="graphicLeft">
+          <img src="assets/sample-graphic.webp" alt="Left side" id="graphicLeft">
         </div>
         <div class="slider-handle" id="graphicHandle"></div>
       </div>
@@ -204,7 +204,7 @@
   </footer>
 
   <script>
-    /* === Universal compare setup === */
+    /*  Universal compare setup  */
     function initCompare(boxId, overlayId, handleId) {
       const box = document.getElementById(boxId);
       const overlay = document.getElementById(overlayId);
@@ -226,20 +226,18 @@
 
       const start = e => {
         active = true;
-        // Optional: Add a class to the body to prevent text selection while dragging
         document.body.classList.add('is-dragging');
         slide(e.touches ? e.touches[0].clientX : e.clientX);
       };
 
       const stop = () => {
         active = false;
-        // Optional: Remove the dragging class
         document.body.classList.remove('is-dragging');
       };
 
       const move = e => {
         if (!active) return;
-        // Prevent default behavior (like scrolling) while dragging
+        // Prevent default behavior while dragging
         e.preventDefault();
         slide(e.touches ? e.touches[0].clientX : e.clientX);
       };
@@ -255,7 +253,7 @@
     initCompare("photoBox", "photoOverlay", "photoHandle");
     initCompare("graphicBox", "graphicOverlay", "graphicHandle");
 
-    /* === Dropdowns + Size === */
+    /*  Dropdowns + Size  */
     async function getSize(url) {
       try {
         const res = await fetch(url);
